@@ -5,6 +5,7 @@ specifiers:
   next: ^13.0.6
   nextra: latest
   nextra-theme-docs: latest
+  prettier: ^2.8.8
   react: ^18.2.0
   react-dom: ^18.2.0
   typescript: ^4.9.3
@@ -18,6 +19,7 @@ dependencies:
 
 devDependencies:
   '@types/node': 18.11.10
+  prettier: 2.8.8
   typescript: 4.9.3
 
 packages:
@@ -1729,6 +1731,12 @@ packages:
       picocolors: 1.0.0
       source-map-js: 1.0.2
     dev: false
+
+  /prettier/2.8.8:
+    resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+    dev: true
 
   /property-information/6.2.0:
     resolution: {integrity: sha512-kma4U7AFCTwpqq5twzC1YVIDXSqg6qQK6JN0smOw8fgRy1OkMi0CYSzFmsy6dnqSenamAtj0CyXMUJ1Mf6oROg==}
