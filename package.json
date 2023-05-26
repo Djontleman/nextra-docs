@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start"
   },
+  "engines": {
+    "pnpm": "7.32"
+  },
   "license": "MIT",
   "dependencies": {
     "next": "^13.0.6",
