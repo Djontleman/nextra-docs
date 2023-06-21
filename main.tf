@@ -1,10 +1,21 @@
 terraform {
-  required_providers {
-    vercel = {
-      source = "vercel/vercel"
-      version = "~> 0.4"
+  cloud {
+    organization = "jhutchinson531"
+
+    workspaces {
+      name = "nextra-docs"
     }
   }
+  required_providers {
+    vercel = {
+      source  = "vercel/vercel"
+      version = "0.13.2"
+    }
+  }
+}
+
+provider "vercel" {
+  api_token = var.vercel_api_token
 }
 
 resource "vercel_project" "nextra_docs" {
@@ -13,12 +24,12 @@ resource "vercel_project" "nextra_docs" {
 }
 
 data "vercel_project_directory" "nextra_docs" {
-  path = ".."
+  path = "."
 }
 
 resource "vercel_deployment" "nextra_docs" {
   project_id  = vercel_project.nextra_docs.id
   files       = data.vercel_project_directory.nextra_docs.files
-  path_prefix = ".."
+  path_prefix = data.vercel_project_directory.nextra_docs.path
   production  = true
 }
