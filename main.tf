@@ -8,11 +8,20 @@ terraform {
   }
   required_version = "~> 1.5.0"
   required_providers {
+    tfe = {
+      source = "hashicorp/tfe"
+      version = "0.45.0"
+    }
     vercel = {
       source  = "vercel/vercel"
       version = "0.13.2"
     }
   }
+}
+
+data "tfe_outputs" "vercel" {
+  organization = "jhutchinson531"
+  workspace    = "nextra-docs"
 }
 
 provider "vercel" {
@@ -29,8 +38,13 @@ data "vercel_project_directory" "nextra_docs" {
 }
 
 resource "vercel_deployment" "nextra_docs" {
-  project_id  = vercel_project.nextra_docs.id
+  project_id  = data.tfe_outputs.vercel.values.vercel_project_id
   files       = data.vercel_project_directory.nextra_docs.files
   path_prefix = data.vercel_project_directory.nextra_docs.path
   production  = true
+}
+
+output "vercel_project_id" {
+  value = vercel_project.nextra_docs.id
+  sensitive = true
 }
