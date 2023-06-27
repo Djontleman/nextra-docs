@@ -9,7 +9,7 @@ terraform {
   required_version = "~> 1.5.0"
   required_providers {
     tfe = {
-      source = "hashicorp/tfe"
+      source  = "hashicorp/tfe"
       version = "0.45.0"
     }
     vercel = {
@@ -41,10 +41,10 @@ resource "vercel_deployment" "nextra_docs" {
   project_id  = data.tfe_outputs.vercel.values.vercel_project_id
   files       = data.vercel_project_directory.nextra_docs.files
   path_prefix = data.vercel_project_directory.nextra_docs.path
-  production  = true
+  production  = var.is_prod
 }
 
 output "vercel_project_id" {
-  value = vercel_project.nextra_docs.id
+  value     = vercel_project.nextra_docs.id
   sensitive = true
 }
