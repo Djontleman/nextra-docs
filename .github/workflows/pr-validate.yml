@@ -35,7 +35,7 @@ jobs:
       - name: Build and deploy preview environment
         id: build-deploy-preview-environment
         run: |
-          terraform plan -var is_prod=true
+          terraform plan
           # terraform apply --auto-approve
 
       # - name: Terraform Output
