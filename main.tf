@@ -29,8 +29,15 @@ provider "vercel" {
 }
 
 resource "vercel_project" "nextra_docs" {
+  count     = var.is_prod ? 1 : 0
   name      = "nextra-docs"
   framework = "nextjs"
+}
+
+output "vercel_project_id" {
+  description = "Vercel project ID"
+  value     = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[*].id : null
+  sensitive = true
 }
 
 data "vercel_project_directory" "nextra_docs" {
@@ -44,7 +51,7 @@ resource "vercel_deployment" "nextra_docs" {
   production  = var.is_prod
 }
 
-output "vercel_project_id" {
-  value     = vercel_project.nextra_docs.id
-  sensitive = true
+output "preview_url" {
+  description = "Preview URL for Vercel deployment"
+  value = vercel_deployment.nextra_docs.url
 }
