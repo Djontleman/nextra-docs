@@ -1,0 +1,66 @@
+name: PR Validate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+permissions:
+  pull-requests: write
+
+jobs:
+  deploy-preview-environment:
+    name: Deploy Preview Environment
+    runs-on: ubuntu-latest
+    env:
+      tfcWorkspaceName: nextra-docs-${{ github.event.number }}
+      tfcOrg: jhutchinson531
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: 1.5.1
+          cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
+
+      - name: Terraform Init, create TFC workspace
+        id: init-workspace
+        run: |
+          sed -i 's/name = "nextra-docs"/name = "'$tfcWorkspaceName'"/' main.tf
+          terraform init -input=false
+
+      - name: Build and deploy preview environment
+        id: build-deploy-preview-environment
+        run: |
+          terraform plan -var is_prod=true
+          # terraform apply --auto-approve
+
+      # - name: Terraform Output
+      #   id: output
+      #   if: github.event_name == 'pull_request' && github.event.action != 'closed'
+      #   run: |
+      #     terraform output -no-color
+      #   continue-on-error: true
+
+      # - name: Create comment with Terraform output
+      #   uses: actions/github-script@0.9.0
+      #   if: github.event_name == 'pull_request' && github.event.action != 'closed'
+      #   env:
+      #     OUTPUT: "${{ steps.output.outputs.stdout }}"
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       const output = `#### Preview Environment Outputs 🖌
+      #       \`\`\`
+      #       ${process.env.OUTPUT}
+      #       \`\`\`
+      #       `
+      #       github.issues.createComment({
+      #         issue_number: context.issue.number,
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: output
+      #       })
