@@ -38,7 +38,7 @@ data "vercel_project_directory" "nextra_docs" {
 }
 
 resource "vercel_deployment" "nextra_docs" {
-  project_id  = data.terraform_remote_state.shared.outputs.vercel_project_id
+  project_id  = data.tfe_outputs.vercel.values.vercel_project_id
   files       = data.vercel_project_directory.nextra_docs.files
   path_prefix = data.vercel_project_directory.nextra_docs.path
   production  = var.is_prod
