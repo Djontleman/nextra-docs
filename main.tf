@@ -35,6 +35,7 @@ resource "vercel_project" "nextra_docs" {
 }
 
 output "vercel_project_id" {
+  description = "Vercel project ID"
   value     = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[*].id : null
   sensitive = true
 }
@@ -48,4 +49,9 @@ resource "vercel_deployment" "nextra_docs" {
   files       = data.vercel_project_directory.nextra_docs.files
   path_prefix = data.vercel_project_directory.nextra_docs.path
   production  = var.is_prod
+}
+
+output "preview_url" {
+  description = "Preview URL for Vercel deployment"
+  value = vercel_deployment.nextra_docs.url
 }
