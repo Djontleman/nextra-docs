@@ -36,7 +36,7 @@ resource "vercel_project" "nextra_docs" {
 
 output "vercel_project_id" {
   description = "Vercel project ID"
-  value     = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[*].id : null
+  value     = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[0].id : null
   sensitive = false
 }
 
