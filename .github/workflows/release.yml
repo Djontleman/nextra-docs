@@ -25,9 +25,11 @@ jobs:
           terraform_version: 1.5.1
           cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
 
-      - name: Terraform Init, create TFC workspace
+      - name: Initialize Terraform Workspace
         id: init-workspace
         run: |
+          echo "Initializing Terraform workspace: $tfcWorkspaceName"
+
           terraform init -input=false
 
       - name: Build and deploy production environment
