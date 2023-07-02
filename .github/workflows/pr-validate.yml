@@ -24,6 +24,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: 1.5.1
+          terraform_wrapper: false
           cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
 
       - name: Terraform Init, create TFC workspace
@@ -38,26 +39,32 @@ jobs:
           terraform apply --auto-approve -var is_prod=${{ vars.IS_VERCEL_PROD }}
 
       - name: Terraform Output
-        id: output
+        # id: output
         run: |
           terraform output -no-color
         continue-on-error: true
 
-      - name: Create comment with Terraform output
-        uses: actions/github-script@v6.4.1
-        env:
-          OUTPUT: '${{ steps.output.outputs.stdout }}'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Preview Environment Outputs 🖌
-            \`\`\`
-            ${process.env.OUTPUT}
-            \`\`\`
-            `
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+      - name: Terraform Output
+        id: output
+        run: |
+          OUTPUT=$(terraform output preview_url)
+          echo $OUTPUT
+
+      # - name: Create comment with Terraform output
+      #   uses: actions/github-script@v6.4.1
+      #   env:
+      #     OUTPUT: '${{ steps.output.outputs.stdout }}'
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       const output = `#### Preview Environment Outputs 🖌
+      #       \`\`\`
+      #       ${process.env.OUTPUT}
+      #       \`\`\`
+      #       `
+      #       github.rest.issues.createComment({
+      #         issue_number: context.issue.number,
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: output
+      #       })
