@@ -9,7 +9,9 @@ jobs:
   deploy-production-environment:
     name: Deploy Production Environment
     runs-on: ubuntu-latest
-    environment: Production
+    environment:
+      name: Production
+      url: ${{ steps.get-prod-url.outputs.prod-url }}
     env:
       tfcWorkspaceName: nextra-docs
       tfcOrg: jhutchinson531
@@ -23,18 +25,28 @@ jobs:
           terraform_version: 1.5.1
           cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
 
-      - name: Terraform Init, create TFC workspace
+      - name: Initialize Terraform Workspace
         id: init-workspace
         run: |
+          echo "Initializing Terraform workspace: $tfcWorkspaceName"
+
           terraform init -input=false
 
-      - name: Build and deploy pproduction environment
+      - name: Build and deploy production environment
         id: build-deploy-production-environment
         run: |
           terraform apply --auto-approve -var is_prod=${{ vars.IS_VERCEL_PROD }}
 
       - name: Terraform Output
-        id: output
         run: |
-          terraform output -no-color
+          terraform output
         continue-on-error: true
+
+      - name: Get Production URL
+        id: get-prod-url
+        run: |
+          PROD_DOMAIN=$(terraform output -raw preview_url)
+          PROD_URL="https://$PROD_DOMAIN"
+
+          echo Production deployed at: $PROD_URL
+          echo "prod-url=$PROD_URL" >> $GITHUB_OUTPUT

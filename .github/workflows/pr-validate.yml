@@ -24,11 +24,14 @@ jobs:
         uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: 1.5.1
+          terraform_wrapper: false
           cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
 
-      - name: Terraform Init, create TFC workspace
+      - name: Initialize Terraform Workspace
         id: init-workspace
         run: |
+          echo "Initializing Terraform workspace: $tfcWorkspaceName"
+
           sed -i 's/name = "nextra-docs"/name = "'$tfcWorkspaceName'"/' main.tf
           terraform init -input=false
 
@@ -38,26 +41,34 @@ jobs:
           terraform apply --auto-approve -var is_prod=${{ vars.IS_VERCEL_PROD }}
 
       - name: Terraform Output
-        id: output
         run: |
-          terraform output -no-color
+          terraform output
         continue-on-error: true
 
-      - name: Create comment with Terraform output
-        uses: actions/github-script@v6.4.1
-        env:
-          OUTPUT: '${{ steps.output.outputs.stdout }}'
+      - name: Get Preview URL
+        id: get-preview-url
+        run: |
+          PREVIEW_DOMAIN=$(terraform output -raw preview_url)
+          PREVIEW_URL="https://$PREVIEW_DOMAIN"
+
+          echo Preview environment deployed at: $PREVIEW_URL
+          echo "preview-url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+
+      - name: Find Comment if Exists
+        uses: peter-evans/find-comment@v2.4.0
+        id: find-comment
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Preview Environment Outputs 🖌
-            \`\`\`
-            ${process.env.OUTPUT}
-            \`\`\`
-            `
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Preview Environment Deployed
+
+      - name: Post Comment with Preview URL
+        uses: peter-evans/create-or-update-comment@v3.0.2
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            #### Preview Environment Deployed 🖌
+
+            Visit the preview at: ${{ steps.get-preview-url.outputs.preview-url }}
+          edit-mode: replace
