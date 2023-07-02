@@ -9,6 +9,7 @@ jobs:
   deploy-production-environment:
     name: Deploy Production Environment
     runs-on: ubuntu-latest
+    environment: Production
     env:
       tfcWorkspaceName: nextra-docs
       tfcOrg: jhutchinson531
@@ -30,7 +31,7 @@ jobs:
       - name: Build and deploy pproduction environment
         id: build-deploy-production-environment
         run: |
-          terraform apply --auto-approve -var is_prod=true
+          terraform apply --auto-approve -var is_prod=${{ vars.IS_VERCEL_PROD }}
 
       - name: Terraform Output
         id: output

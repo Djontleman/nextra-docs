@@ -35,7 +35,7 @@ jobs:
       - name: Build and deploy preview environment
         id: build-deploy-preview-environment
         run: |
-          terraform apply --auto-approve
+          terraform apply --auto-approve -var is_prod=${{ vars.IS_VERCEL_PROD }}
 
       - name: Terraform Output
         id: output
