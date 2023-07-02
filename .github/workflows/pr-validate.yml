@@ -52,18 +52,21 @@ jobs:
           echo Preview environment deployed at: $PREVIEW_URL
           echo "preview-url=$PREVIEW_URL" >> $GITHUB_OUTPUT
 
-      - name: Create comment with Terraform output
-        uses: actions/github-script@v6.4.1
+      - name: Find Comment if Exists
+        uses: peter-evans/find-comment@v2.4.0
+        id: find-comment
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Preview Environment Deployed 🖌
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Preview Environment Deployed
 
-            Visit the preview at: \`${{ steps.get-preview-url.outputs.preview-url }}\`
-            `
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+      - name: Post Comment with Preview URL
+        uses: peter-evans/create-or-update-comment@v3.0.2
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            #### Preview Environment Deployed 🖌
+
+            Visit the preview at: ${{ steps.get-preview-url.outputs.preview-url }}
+          edit-mode: replace
