@@ -39,32 +39,29 @@ jobs:
           terraform apply --auto-approve -var is_prod=${{ vars.IS_VERCEL_PROD }}
 
       - name: Terraform Output
-        # id: output
         run: |
-          terraform output -no-color
+          terraform output
         continue-on-error: true
 
-      - name: Terraform Output
-        id: output
+      - name: Get Preview URL
+        id: get-preview-url
         run: |
-          OUTPUT=$(terraform output preview_url)
-          echo $OUTPUT
+          PREVIEW_URL=$(terraform output -raw preview_url)
+          echo Preview environment deployed at: $PREVIEW_URL
+          echo "preview-url=$PREVIEW_URL" >> $GITHUB_OUTPUT
 
-      # - name: Create comment with Terraform output
-      #   uses: actions/github-script@v6.4.1
-      #   env:
-      #     OUTPUT: '${{ steps.output.outputs.stdout }}'
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     script: |
-      #       const output = `#### Preview Environment Outputs 🖌
-      #       \`\`\`
-      #       ${process.env.OUTPUT}
-      #       \`\`\`
-      #       `
-      #       github.rest.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: output
-      #       })
+      - name: Create comment with Terraform output
+        uses: actions/github-script@v6.4.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Preview Environment Deployed 🖌
+
+            Visit the preview at: ${{ steps.get-preview-url.outputs.preview-url }}
+            `
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
