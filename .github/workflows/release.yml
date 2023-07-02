@@ -43,6 +43,8 @@ jobs:
       - name: Get Production URL
         id: get-prod-url
         run: |
-          PROD_URL=$(terraform output -raw preview_url)
-          echo Production deployed at: $PREVIEW_URL
+          PROD_DOMAIN=$(terraform output -raw preview_url)
+          PROD_URL="https://$PROD_DOMAIN"
+
+          echo Production deployed at: $PROD_URL
           echo "prod-url=$PROD_URL" >> $GITHUB_OUTPUT

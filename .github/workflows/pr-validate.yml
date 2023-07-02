@@ -46,7 +46,9 @@ jobs:
       - name: Get Preview URL
         id: get-preview-url
         run: |
-          PREVIEW_URL=$(terraform output -raw preview_url)
+          PREVIEW_DOMAIN=$(terraform output -raw preview_url)
+          PREVIEW_URL="https://$PREVIEW_DOMAIN"
+
           echo Preview environment deployed at: $PREVIEW_URL
           echo "preview-url=$PREVIEW_URL" >> $GITHUB_OUTPUT
 
@@ -57,7 +59,7 @@ jobs:
           script: |
             const output = `#### Preview Environment Deployed 🖌
 
-            Visit the preview at: ${{ steps.get-preview-url.outputs.preview-url }}
+            Visit the preview at: \`${{ steps.get-preview-url.outputs.preview-url }}\`
             `
             github.rest.issues.createComment({
               issue_number: context.issue.number,
