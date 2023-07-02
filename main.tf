@@ -36,7 +36,7 @@ resource "vercel_project" "nextra_docs" {
 
 output "vercel_project_id" {
   description = "Vercel project ID"
-  value     = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[*].id : null
+  value     = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[0].id : null
   sensitive = false
 }
 
@@ -45,7 +45,8 @@ data "vercel_project_directory" "nextra_docs" {
 }
 
 resource "vercel_deployment" "nextra_docs" {
-  project_id  = data.tfe_outputs.vercel.values.vercel_project_id
+  project_id  = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[0].id : null
+  # project_id  = data.tfe_outputs.vercel.values.vercel_project_id
   files       = data.vercel_project_directory.nextra_docs.files
   path_prefix = data.vercel_project_directory.nextra_docs.path
   production  = var.is_prod
