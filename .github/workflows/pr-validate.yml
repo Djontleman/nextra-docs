@@ -48,7 +48,7 @@ jobs:
       - name: Get Preview URL
         id: get-preview-url
         run: |
-          PREVIEW_DOMAIN=$(terraform output -raw preview_url)
+          PREVIEW_DOMAIN=$(terraform output -raw preview_domain)
           PREVIEW_URL="https://$PREVIEW_DOMAIN"
 
           echo Preview environment deployed at: $PREVIEW_URL

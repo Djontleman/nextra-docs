@@ -23,6 +23,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: 1.5.1
+          terraform_wrapper: false
           cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
 
       - name: Initialize Terraform Workspace
@@ -45,7 +46,7 @@ jobs:
       - name: Get Production URL
         id: get-prod-url
         run: |
-          PROD_DOMAIN=$(terraform output -raw preview_url)
+          PROD_DOMAIN=$(terraform output -raw prod_domain)
           PROD_URL="https://$PROD_DOMAIN"
 
           echo Production deployed at: $PROD_URL
