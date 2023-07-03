@@ -36,8 +36,8 @@ resource "vercel_project" "nextra_docs" {
 
 output "vercel_project_id" {
   description = "Vercel project ID"
-  value     = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[0].id : null
-  sensitive = false
+  value       = length(vercel_project.nextra_docs) > 0 ? vercel_project.nextra_docs[0].id : null
+  sensitive   = false
 }
 
 data "vercel_project_directory" "nextra_docs" {
@@ -53,10 +53,10 @@ resource "vercel_deployment" "nextra_docs" {
 
 output "preview_domain" {
   description = "Preview URL for Vercel deployment"
-  value = vercel_deployment.nextra_docs.url
+  value       = vercel_deployment.nextra_docs.url
 }
 
 output "prod_domain" {
   description = "Prod domain for Vercel project"
-  value = is_prod ? vercel_deployment.nextra_docs.domains[0] : null
+  value       = is_prod ? vercel_deployment.nextra_docs.domains[0] : null
 }
