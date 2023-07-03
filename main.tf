@@ -55,3 +55,7 @@ output "preview_url" {
   description = "Preview URL for Vercel deployment"
   value = vercel_deployment.nextra_docs.url
 }
+
+output "domains" {
+  value = vercel_deployment.nextra_docs.domains
+}
