@@ -51,11 +51,12 @@ resource "vercel_deployment" "nextra_docs" {
   production  = var.is_prod
 }
 
-output "preview_url" {
+output "preview_domain" {
   description = "Preview URL for Vercel deployment"
   value = vercel_deployment.nextra_docs.url
 }
 
-output "domains" {
-  value = vercel_deployment.nextra_docs.domains
+output "prod_domain" {
+  description = "Prod domain for Vercel project"
+  value = is_prod ? vercel_deployment.nextra_docs.domains[0] : null
 }
