@@ -58,5 +58,5 @@ output "preview_domain" {
 
 output "prod_domain" {
   description = "Prod domain for Vercel project"
-  value       = is_prod ? vercel_deployment.nextra_docs.domains[0] : null
+  value       = is_prod ? element(vercel_deployment.nextra_docs.domains, 0) : null
 }
